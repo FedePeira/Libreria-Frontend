@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 
 const Authors = (props) => {
+  
   if (!props.show) {
     return null
   }
-  const authors = []
+
+  const authors = props.authors
 
   return (
     <div>
@@ -30,6 +32,13 @@ const Authors = (props) => {
 }
 
 Authors.propTypes = {
+  authors: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        born: PropTypes.number.isRequired,
+        bookCount: PropTypes.number.isRequired,
+      })
+  ).isRequired,
   show: PropTypes.bool.isRequired,
 }
 

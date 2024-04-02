@@ -3,23 +3,27 @@ import { useMutation } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { LOGIN } from '../queries'
 
-const LoginForm = ({ setError, setToken }) => {
+const LoginForm = (props) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
   const [login, result] = useMutation(LOGIN, {
     onError: (error) => {
-        setError(error.graphQLErrors[0].message)
+        props.setError(error.graphQLErrors[0].message)
     }
   })
 
   useEffect(() => {
     if (result.data ) {
       const token = result.data.login.value
-      setToken(token)
+      props.setToken(token)
       localStorage.setItem('phonenumbers-user-token', token)
     }
   }, [result.data])
+
+  if (!props.show) {
+    return null
+  }
 
   const submit = async (event) => {
     event.preventDefault()
@@ -35,10 +39,12 @@ const LoginForm = ({ setError, setToken }) => {
             console.error('Error al iniciar sesión:', error);
           }, 
     })
+    props.setPage('authors')
   }
 
   return (
     <div>
+      <h2>Login</h2>
       <form onSubmit={submit}>
         <div>
           username <input
@@ -62,6 +68,8 @@ const LoginForm = ({ setError, setToken }) => {
 LoginForm.propTypes = {
   setError: PropTypes.func.isRequired,
   setToken: PropTypes.func.isRequired,
+  setPage: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
 }
 
 export default LoginForm

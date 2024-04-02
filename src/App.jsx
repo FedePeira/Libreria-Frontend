@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Authors from './components/Authors'
 import Books from './components/Books'
@@ -41,6 +41,10 @@ const App = () => {
 
   const client = useApolloClient()
 
+  useEffect(() => {
+    setPage('authors')
+  }, [])
+
   const notify = (message) => {
     setErrorMessage(message)
     setTimeout(() => {
@@ -66,11 +70,20 @@ const App = () => {
     return (
       <>
         <Notify errorMessage={errorMessage} />
-        <h2>Login</h2>
+        <div>
+          <button onClick={() => setPage('authors')}>authors</button>
+          <button onClick={() => setPage('books')}>books</button>
+          <button onClick={() => setPage('login')}>login</button>
+        </div>
         <LoginForm
+          setPage={setPage}
+          show={page === 'login'}
           setToken={setToken}
           setError={notify}
         />
+
+        <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/>
+        <Books show={page === 'books'} books={books.data.allBooks} authors={authors.data.allAuthors}/>
       </>
     )
   }

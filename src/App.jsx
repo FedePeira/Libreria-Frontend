@@ -1,9 +1,12 @@
 import { useState } from 'react'
+
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
-import { gql, useQuery } from '@apollo/client'
-import PropTypes from 'prop-types';
+import Notify from './components/Notify'
+import LoginForm from './components/LoginForm'
+
+import { gql, useApolloClient, useQuery } from '@apollo/client'
 
 const ALL_BOOKS = gql`
 query {
@@ -34,12 +37,21 @@ const App = () => {
   })
   const [errorMessage, setErrorMessage] = useState(null)
   const [page, setPage] = useState('authors')
+  const [token, setToken] = useState(null)
+
+  const client = useApolloClient()
 
   const notify = (message) => {
     setErrorMessage(message)
     setTimeout(() => {
       setErrorMessage(null)
     }, 10000)
+  }
+
+  const logout = () => {
+    setToken(null)
+    localStorage.clear()
+    client.resetStore()
   }
 
   if (books.loading)   {
@@ -50,16 +62,27 @@ const App = () => {
     return <div>loading...</div>
   }
 
-  console.log(authors.data.allAuthors)
-  console.log(books.data.allBooks)
+  if(!token) {
+    return (
+      <>
+        <Notify errorMessage={errorMessage} />
+        <h2>Login</h2>
+        <LoginForm
+          setToken={setToken}
+          setError={notify}
+        />
+      </>
+    )
+  }
 
   return (
-    <div>
+    <>
       <Notify errorMessage={errorMessage}/>
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
         <button onClick={() => setPage('add')}>add book</button>
+        <button onClick={logout}>logout</button>
       </div>
 
       <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/>
@@ -67,22 +90,8 @@ const App = () => {
       <Books show={page === 'books'} books={books.data.allBooks} authors={authors.data.allAuthors}/>
 
       <NewBook show={page === 'add'}  />
-    </div>
+    </>
   )
 }
-
-const Notify = ({errorMessage}) => {
-  if ( !errorMessage ) {
-    return null
-  }
-  return (
-    <div style={{color: 'red'}}>
-    {errorMessage}
-    </div>
-  )
-}
-Notify.propTypes = {
- errorMessage: PropTypes.string,
-};
 
 export default App

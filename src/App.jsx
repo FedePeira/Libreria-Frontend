@@ -64,7 +64,7 @@ const App = () => {
 
       <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/>
 
-      <Books show={page === 'books'} books={books.data.allBooks}/>
+      <Books show={page === 'books'} books={books.data.allBooks} authors={authors.data.allAuthors}/>
 
       <NewBook show={page === 'add'}  />
     </div>

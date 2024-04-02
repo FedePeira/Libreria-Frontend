@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import Book from './Book'
 
 const Books = (props) => {
   if (!props.show) {
@@ -18,11 +19,9 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a) => (
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author}</td>
-              <td>{a.published}</td>
+          {books.map((b) => (
+            <tr key={b.title}>
+              <Book key={b.title} book={b}/>
             </tr>
           ))}
         </tbody>
@@ -32,6 +31,13 @@ const Books = (props) => {
 }
 
 Books.propTypes = {
+  authors: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      born: PropTypes.number,
+      bookCount: PropTypes.number.isRequired,
+    })
+  ).isRequired,
   show: PropTypes.bool.isRequired,
   books: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.string.isRequired,

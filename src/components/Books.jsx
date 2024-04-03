@@ -21,11 +21,9 @@ const Books = (props) => {
     return null
   }
 
-  const showBook = () => {
+  const showBooks = () => {
     if(!genre) {
-      console.log('Entre en genre undefined')
       return books.map((b) => {
-        console.log(b)
         return(
           <tr key={b.title}>
             <Book key={b.title} book={b}/>
@@ -33,7 +31,6 @@ const Books = (props) => {
         )
       })
     } else {
-      console.log('Entre en genre para filtrar')
       return books.map((b) => (
         b.genres.includes(genre) ? (
           <tr key={b.title}>
@@ -44,10 +41,9 @@ const Books = (props) => {
     }
   }
 
-
   return (
     <div>
-      <h2>books</h2>
+      <h2>Books</h2>
 
       <table>
         <tbody>
@@ -56,7 +52,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {showBook()}
+          {showBooks()}
         </tbody>
       </table>
       <div>

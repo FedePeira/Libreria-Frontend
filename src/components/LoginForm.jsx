@@ -9,7 +9,12 @@ const LoginForm = (props) => {
 
   const [login, result] = useMutation(LOGIN, {
     onError: (error) => {
-        props.setError(error.graphQLErrors[0].message)
+      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        const graphQLErrors = error.graphQLErrors;
+        console.error('Errores de GraphQL:', graphQLErrors);
+      } else {
+        console.error('Error al iniciar sesión:', error);
+      }    
     }
   })
 

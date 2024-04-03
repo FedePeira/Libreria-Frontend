@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { gql, useMutation } from '@apollo/client'
 import PropTypes from 'prop-types'
-import Select from 'react-select';
+import Select from 'react-select'
 
 const EDIT_BORN = gql`
   mutation changeBorn($name: String!, $born: Int!) {
-    editAuthor(name: $name, setBornTo: $born) {
+    editAuthor(
+      name: $name, 
+      setBornTo: $born
+    ) {
        name
-       setBornTo
+       born
     }
    }
 `
@@ -26,16 +29,21 @@ const BornForm = ({ setError, authors }) => {
   const [selectedAuthor, setSelectedAuthor] = useState(null);
   const [born, setBorn] = useState(0)
 
-  const [ changeBorn ] = useMutation(EDIT_BORN,{
+  const [ changeBorn ] = useMutation(EDIT_BORN, {
     refetchQueries: [  {query: ALL_AUTHORS } ],
     onError: (error) => {
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
-        const errors = error.graphQLErrors[0].extensions.error.errors;
-        const messages = Object.values(errors).map(e => e.message).join('\n');
-        setError(messages);
-      } else {
-        setError("An error occurred, but no GraphQL errors were found.");
-      }
+        const firstError = error.graphQLErrors[0];
+        if (firstError.extensions && firstError.extensions.error && firstError.extensions.error.errors) {
+          const errors = firstError.extensions.error.errors;
+          const messages = Object.values(errors).map(e => e.message).join('\n');
+          setError(messages);
+        } else {
+          setError('An unexpected error occurred.');
+        }
+     } else {
+        setError('An unexpected error occurred.');
+     }
     }
   })
 
@@ -48,7 +56,8 @@ const BornForm = ({ setError, authors }) => {
     event.preventDefault()
 
     if (selectedAuthor) {
-        changeBorn({ variables: { name: selectedAuthor.name, born } })
+        const name = selectedAuthor.name
+        changeBorn({ variables: { name, born: parseInt(born, 10) } })
     }
 
     setSelectedAuthor(null)

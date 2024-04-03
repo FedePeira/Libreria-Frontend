@@ -104,7 +104,7 @@ const App = () => {
 
       <Books show={page === 'books'} books={books.data.allBooks} authors={authors.data.allAuthors}/>
 
-      <NewBook show={page === 'add'}  />
+      <NewBook show={page === 'add'}  setError={notify}/>
 
       <Recommend show={page === 'recommend'}  books={books.data.allBooks}/>
     </>

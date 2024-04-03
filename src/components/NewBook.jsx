@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 
 const CREATE_BOOK = gql`
-mutation createBook($title: String!, $author: String!, $published: Int!, $genres: [String!]!)
-{
+mutation createBook($title: String!, $author: String!, $published: Int!, $genres: [String!]!) {
   addBook(
     title: $title,
     author: $author,
@@ -19,6 +18,17 @@ mutation createBook($title: String!, $author: String!, $published: Int!, $genres
 }
 `
 
+const ALL_BOOKS = gql`
+query {
+  allBooks { 
+    title 
+    author
+    published 
+    genres
+  }
+}
+`
+
 const NewBook = (props) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -26,7 +36,23 @@ const NewBook = (props) => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
 
-  const [ createBook ] = useMutation(CREATE_BOOK)
+  const [ createBook ] = useMutation(CREATE_BOOK, {
+    refetchQueries: [  {query: ALL_BOOKS} ],
+    onError: (error) => {
+      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        const firstError = error.graphQLErrors[0];
+        if (firstError.extensions && firstError.extensions.error && firstError.extensions.error.errors) {
+          const errors = firstError.extensions.error.errors;
+          const messages = Object.values(errors).map(e => e.message).join('\n');
+          props.setError(messages);
+        } else {
+          props.setError('An unexpected error occurred.');
+        }
+     } else {
+        props.setError('An unexpected error occurred.');
+     }
+    }
+  })
 
   if (!props.show) {
     return null
@@ -36,7 +62,7 @@ const NewBook = (props) => {
     event.preventDefault()
 
     console.log(title, " + ", author, " + ", published, " + ", genres)
-    createBook({ variables: { title, author, published, genres } })
+    createBook({ variables: { title, author, published: parseInt(published, 10), genres } })
 
     console.log('add book...')
 
@@ -95,5 +121,6 @@ const NewBook = (props) => {
 
 NewBook.propTypes = {
   show: PropTypes.bool.isRequired,
+  setError: PropTypes.func.isRequired,
 }
 export default NewBook
